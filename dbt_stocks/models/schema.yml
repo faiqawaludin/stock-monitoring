@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_stock
+    description: "Staging model untuk data harian saham dari Marketstack"
+    columns:
+      - name: ticker
+        description: "Kode simbol saham"
+        tests:
+          - not_null
+      - name: date
+        description: "Tanggal perdagangan saham"
+        tests:
+          - not_null
+      - name: close
+        description: "Harga penutupan saham"
+        tests:
+          - not_null
+          - expression_is_true:
+              expression: "close > 0"

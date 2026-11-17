@@ -45,3 +45,9 @@ jobs:
       - name: Transform with dbt
         working-directory: ./dbt_stocks
         run: dbt build --profiles-dir .
+
+      - name: Transform and Test with dbt
+        working-directory: ./dbt_stocks
+        run: |
+          dbt run --profiles-dir .
+          dbt test --profiles-dir .
