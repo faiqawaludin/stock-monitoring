@@ -5,7 +5,7 @@ WITH base AS (
             PARTITION BY symbol
             ORDER BY trade_date
         ) AS prev_close_price
-    FROM {{ ref('stg_stocks') }}
+    FROM {{ ref('stg_stock') }}
 )
 
 SELECT
