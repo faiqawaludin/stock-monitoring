@@ -5,20 +5,22 @@ import pandas as pd
 import requests
 from google.cloud import bigquery
 
-API_KEY = os.environ["MARKETSTACK_API_KEY"]
-PROJECT_ID = os.environ["GCP_PROJECT_ID"]
+API_KEY = os.environ["MARKETSTACK_API_KEY"].strip()
+PROJECT_ID = os.environ["GCP_PROJECT_ID"].strip()
 SYMBOLS = "AAPL,GOOGL,MSFT,NVDA"
 TABLE_ID = f"{PROJECT_ID}.raw_stocks.eod_prices"
 
 
 def fetch_stock_eod():
-    url = "http://api.marketstack.com/v1/eod"
+    url = "https://api.apilayer.com/marketstack/v1/eod"
+    headers = {
+        "apikey": API_KEY,
+    }
     params = {
-        "access_key": API_KEY,
         "symbols": SYMBOLS,
         "limit": 100,
     }
-    res = requests.get(url, params=params, timeout=20)
+    res = requests.get(url, headers=headers, params=params, timeout=20)
     res.raise_for_status()
     payload = res.json()
 
@@ -26,7 +28,6 @@ def fetch_stock_eod():
         raise ValueError(f"Data kosong atau error dari API: {payload}")
 
     df = pd.DataFrame(payload["data"])
-    # Ambil kolom utama saja agar skema BigQuery bersih dari kolom null
     cols = ["symbol", "exchange", "date", "open", "high", "low", "close", "volume"]
     df = df[cols].copy()
     df["ingested_at"] = datetime.now(UTC)
