@@ -1,5 +1,6 @@
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pandas as pd
 import requests
 from google.cloud import bigquery
@@ -7,7 +8,7 @@ from google.cloud import bigquery
 API_KEY = os.environ["MARKETSTACK_API_KEY"].strip()
 PROJECT_ID = os.environ["GCP_PROJECT_ID"].strip()
 SYMBOLS = "AAPL,GOOGL,MSFT,NVDA"
-TABLE_ID = f"{PROJECT_ID}.raw_stocks.eod_prices"
+TABLE_ID = f"{PROJECT_ID}.raw_stock.eod_prices"
 
 
 def fetch_stock_eod():
@@ -32,7 +33,7 @@ def fetch_stock_eod():
             df[col] = None
 
     df = df[cols].copy()
-    df["ingested_at"] = datetime.now(timezone.utc)
+    df["ingested_at"] = datetime.now(UTC)
     return df
 
 
