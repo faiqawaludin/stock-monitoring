@@ -1,0 +1,39 @@
+name: Stock ELT Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-elt:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      MARKETSTACK_API_KEY: ${{ secrets.MARKETSTACK_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Run Extract & Load
+        run: python extract_load.py
+
+      - name: Run dbt transformations
+        working-directory: ./dbt_stocks
+        run: dbt build --profiles-dir .
