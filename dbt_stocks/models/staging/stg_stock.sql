@@ -13,7 +13,7 @@ WITH ranked AS (
             PARTITION BY symbol, DATE(TIMESTAMP(date))
             ORDER BY ingested_at DESC
         ) AS rn
-    FROM {{ source('raw_stocks', 'eod_prices') }}
+    FROM {{ source('raw_stock', 'eod_prices') }}
 )
 
 SELECT

@@ -1,8 +1,7 @@
 version: 2
 
 sources:
-  - name: raw_stocks
-    database: "{{ env_var('GCP_PROJECT_ID') }}"
-    schema: raw_stocks
+  - name: raw_stock
+    schema: raw_stock
     tables:
       - name: eod_prices
