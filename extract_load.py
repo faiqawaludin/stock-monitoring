@@ -1,6 +1,5 @@
 import os
-from datetime import UTC, datetime
-
+from datetime import datetime, timezone
 import pandas as pd
 import requests
 from google.cloud import bigquery
@@ -33,7 +32,7 @@ def fetch_stock_eod():
             df[col] = None
 
     df = df[cols].copy()
-    df["ingested_at"] = datetime.now(UTC)
+    df["ingested_at"] = datetime.now(timezone.utc)
     return df
 
 
