@@ -11,30 +11,18 @@ TABLE_ID = f"{PROJECT_ID}.raw_stocks.eod_prices"
 
 
 def fetch_stock_eod():
-    # 1. Coba endpoint Marketstack v2 (untuk API Key dari marketstack.com)
-    res_v2 = requests.get(
-        "https://api.marketstack.com/v2/eod",
-        params={"access_key": API_KEY, "symbols": SYMBOLS, "limit": 100},
-        timeout=20,
-    )
-    if res_v2.ok:
-        payload = res_v2.json()
-    else:
-        # 2. Fallback ke gateway APILayer tanpa /v1 (untuk API Key dari apilayer.com)
-        res_apilayer = requests.get(
-            "https://api.apilayer.com/marketstack/eod",
-            headers={"apikey": API_KEY},
-            params={"symbols": SYMBOLS, "limit": 100},
-            timeout=20,
-        )
-        if res_apilayer.ok:
-            payload = res_apilayer.json()
-        else:
-            raise RuntimeError(
-                f"Autentikasi API gagal (panjang MARKETSTACK_API_KEY={len(API_KEY)} karakter).\n"
-                f"- Marketstack v2 ({res_v2.status_code}): {res_v2.text}\n"
-                f"- APILayer ({res_apilayer.status_code}): {res_apilayer.text}"
-            )
+    url = "https://api.apilayer.com/marketstack/eod"
+    headers = {
+        "apikey": API_KEY,
+    }
+    params = {
+        "symbols": SYMBOLS,
+        "limit": 100,
+    }
+    res = requests.get(url, headers=headers, params=params, timeout=20)
+    if not res.ok:
+        raise RuntimeError(f"API Error {res.status_code}: {res.text}")
+    payload = res.json()
 
     if "data" not in payload or not payload["data"]:
         raise ValueError(f"Data kosong atau format tidak sesuai: {payload}")
