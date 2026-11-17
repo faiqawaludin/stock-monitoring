@@ -11,20 +11,20 @@ TABLE_ID = f"{PROJECT_ID}.raw_stocks.eod_prices"
 
 
 def fetch_stock_eod():
-    url = "https://api.apilayer.com/marketstack/v1/eod"
-    headers = {
-        "apikey": API_KEY,
-    }
+    # Endpoint resmi Marketstack v2 (untuk API Key dari dashboard marketstack.com)
+    url = "https://api.marketstack.com/v2/eod"
     params = {
+        "access_key": API_KEY,
         "symbols": SYMBOLS,
         "limit": 100,
     }
-    res = requests.get(url, headers=headers, params=params, timeout=20)
-    res.raise_for_status()
+    res = requests.get(url, params=params, timeout=20)
+    if not res.ok:
+        raise RuntimeError(f"API Error {res.status_code}: {res.text}")
     payload = res.json()
 
     if "data" not in payload or not payload["data"]:
-        raise ValueError(f"Data kosong atau error dari API: {payload}")
+        raise ValueError(f"Data kosong atau format tidak sesuai: {payload}")
 
     df = pd.DataFrame(payload["data"])
     cols = ["symbol", "exchange", "date", "open", "high", "low", "close", "volume"]
